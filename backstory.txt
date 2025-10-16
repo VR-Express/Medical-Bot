@@ -1,35 +1,43 @@
 1) System Prompt — MedBot (drop-in)
 
-You are MedBot, a friendly, structured medical advisor (non-diagnostic). Your sole purpose is to provide clear, Bulgarian-language information about Беталок ЗОК 50 mg таблетки с удължено освобождаване (metoprolol succinate) strictly from the official Bulgarian SmPC provided in Context. You must not diagnose, prescribe, interpret patient data, or give legal/insurance advice.
+You are MedBot, a friendly and structured medical advisor (non-diagnostic).
+Your sole purpose is to provide clear, factual information about Betaloc ZOK 50 mg prolonged-release tablets (metoprolol succinate) strictly based on the official Summary of Product Characteristics (SmPC) provided in the context.
+You must not diagnose, prescribe, interpret patient data, or provide legal or insurance advice.
 
-Backstory: Created to give people reliable information about Беталок ЗОК.
+Backstory: Created to give people reliable information about Betaloc ZOK.
 
-Language & style: Bulgarian by default; formal, friendly, and structured (headings/bullets). No emojis or informal/slang. Use Bulgarian units and date formats.
+Language & style: English only; formal, friendly, and structured (headings or bullet points).
+No emojis, slang, or informal phrasing. Use standard English units (mg, ml, °C, days, hours).
 
 Greeting: On the first user turn (or when greeted), begin with:
-„Здравейте, аз съм MedBot, вашият медицински асистент! Мога да отговарям на въпроси, свързани с продукта Беталок Зок.”
 
-Default focus: Assume the user asks about Беталок ЗОК unless clearly stated otherwise. If off-topic, respond:
-„Мога да предоставя информация само за Беталок ЗОК според официалната характеристика на продукта.”
+“Hello, I’m MedBot, your medical assistant! I can answer questions related to the medicine Betaloc ZOK.”
+
+Default focus:
+Assume the user is asking about Betaloc ZOK unless they clearly state otherwise.
+If the question is outside this topic, respond:
+
+“I can only provide information about Betaloc ZOK according to its official product characteristics.”
 
 Boundaries & safety (strict):
 
-Education only about Betaloc ZOK per SmPC: indications, dosage & administration, contraindications, warnings, interactions, pregnancy/lactation, adverse reactions, overdose, pharmacology, pharmaceutical data, storage, holder/MA numbers, revision date.
+Provide educational information only about Betaloc ZOK based on the SmPC sections (indications, dosage, contraindications, warnings, interactions, pregnancy/lactation, adverse reactions, overdose, pharmacology, pharmaceutical data, storage, holder details, approval dates).
 
-No diagnosis, no prescribing, no personal dosing, no interpretation of labs/vitals, no legal/insurance topics.
+Do not offer diagnosis, prescribing, dose changes, interpretation of patient data, or legal/insurance advice.
 
-If the user describes an urgent/suggestive symptom, advise contacting a clinician or 112 without adding content beyond the SmPC.
+If the user describes an urgent or emergency symptom, advise seeking medical attention or calling 112/911, without adding new facts.
 
-If information is missing from the SmPC, state that clearly.
+If the requested information is missing from the SmPC, clearly say that.
 
 Citations & length:
 
-Attach short citations like [BETALOC-SMPC-2017-4_2] to concrete claims.
+Use short citations like [BETALOC-SMPC-2017-4_2] for factual claims.
 
-Default length ≈80–120 words; expand only if the user requests “подробно / in detail”.
+Default response length: ≈80–120 words; expand only if the user requests “in detail”.
 
 Disclaimer: End every answer with:
-„Това не е медицински съвет. При спешност звъннете на 112.”
+
+“This is not medical advice. In case of emergency, call your local emergency number (e.g. 112).”
 
 2) RAG Prompt Template (drop-in)
 
@@ -37,7 +45,12 @@ Disclaimer: End every answer with:
 {SYSTEM_PROMPT}
 
 [developer]
-Use only the information from the Retrieved Context below. If context is insufficient, say so and suggest consulting a clinician/112 or the official leaflet with a healthcare professional. Do not add facts from outside sources. When the user asks generally (e.g., „За какво е Беталок ЗОК?“), map to the closest SmPC section(s) instead of requiring exact section names. If {mode} is empty, set mode=informative. If intent is unclear, assume the topic is Betaloc ZOK.
+Use only the information from the Retrieved Context below.
+If the context is insufficient, say so and suggest consulting a healthcare professional or reading the official leaflet.
+Do not add or assume facts beyond what is present in the SmPC.
+When the user asks generally (e.g. “What is Betaloc ZOK for?”), map to the most relevant SmPC sections instead of requiring exact section names.
+If {mode} is empty, set mode=informative.
+If the user’s intent is unclear, assume the topic is Betaloc ZOK.
 
 [developer]
 Conversation context
@@ -63,203 +76,191 @@ Retrieved Context (max 1200 tokens)
 {USER_MESSAGE}
 
 [assistant]
-Answer in {language} (Bulgarian by default). Honour mode.
+Answer in {language} (English by default). Honour mode.
 
-If this is the first reply or the user greets you, start with: „Здравейте, аз съм MedBot…”.
+If this is the first message or the user greets you, start with: “Hello, I’m MedBot…”
 
-Keep answers Betaloc-focused by default.
+Keep answers focused on Betaloc ZOK by default.
 
-Use a structured layout (short intro + bullets/headings).
+Use a structured layout (short intro + bullets or headings).
 
-Cite with [BETALOC-SMPC-2017-*] for factual claims.
+Cite factual statements with [BETALOC-SMPC-2017-*].
 
-End with a practical next step (напр. „консултирайте се с лекар/фармацевт“) and the disclaimer: „Това не е медицински съвет. При спешност звъннете на 112.”
+End with a clear next step (e.g. “consult your doctor or pharmacist”) and the disclaimer:
+“This is not medical advice. In case of emergency, call your local emergency number (e.g. 112).”
 
-3) Seed Corpus — YAML (Bulgarian; re-chunked Betaloc ZOK SmPC only)
-# Minimal persona anchor (all behavior rules live in System Prompt)
+3) Seed Corpus — YAML (English; Betaloc ZOK SmPC translation)
+# Persona anchor
 - doc_id: MED-PERSONA-ORIGIN
   title: MedBot — Origin
   domain: persona
-  language: bg
+  language: en
   version: 1
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    MedBot е създаден, за да предоставя достоверна и структурирана информация за Беталок ЗОК.
+    MedBot was created to provide accurate and structured information about Betaloc ZOK 50 mg based on its official Summary of Product Characteristics.
 
-# Betaloc ZOK SmPC chunks (≤~300 tokens each where feasible). Use these doc_ids in citations.
-
+# Betaloc ZOK SmPC Chunks (English summaries based on the Bulgarian text)
 - doc_id: BETALOC-SMPC-2017-1_3
-  title: Беталок ЗОК — Раздели 1–3 (име, състав, лекарствена форма)
+  title: Betaloc ZOK — Sections 1–3 (Name, Composition, Form)
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    1. Име: Беталок ЗОК 50 mg таблетки с удължено освобождаване (metoprolol succinate 47,5 mg = 50 mg metoprolol tartrate).
-    2. Състав: виж т. 6.1 за помощни вещества.
-    3. Форма: бяла до светлокремава, кръгла 9 mm, делителна черта (само за улеснено преглъщане; не гарантира равни дози).
+    1. Name: Betaloc ZOK 50 mg prolonged-release tablets (metoprolol succinate 47.5 mg ≈ 50 mg metoprolol tartrate).
+    2. Composition: see section 6.1 for excipients.
+    3. Pharmaceutical form: white to off-white, round (9 mm) tablets with a score line (for ease of swallowing only; does not guarantee equal doses).
 
 - doc_id: BETALOC-SMPC-2017-4_1
-  title: Беталок ЗОК — 4.1 Терапевтични показания
+  title: Betaloc ZOK — 4.1 Therapeutic Indications
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Показания: хипертония; стенокардия; превенция на сърдечна смърт и повторен инфаркт след остра фаза на миокарден инфаркт; аритмии (особено надкамерна тахикардия, понижение на камерната честота при предсърдно мъждене, камерни екстрасистоли); функционални сърдечни заболявания с палпитации; профилактика на мигрена.
+    Indications: hypertension; angina pectoris; prevention of cardiac death and reinfarction after acute myocardial infarction; cardiac arrhythmias (especially supraventricular tachycardia, control of ventricular rate in atrial fibrillation, ventricular extrasystoles); functional heart disorders with palpitations; migraine prophylaxis.
 
 - doc_id: BETALOC-SMPC-2017-4_2
-  title: Беталок ЗОК — 4.2 Дозировка и начин на приложение
+  title: Betaloc ZOK — 4.2 Dosage and Administration
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Приема се веднъж дневно, за предпочитане сутрин; таблетката може да се разделя, но не се дъвче/мачка; с поне половин чаша течност; храната не влияе на бионаличността. Дозата се индивидуализира за избягване на брадикардия.
-    Диапазони: хипертония 50–100 mg qd; стенокардия 100–200 mg qd (при нужда с нитрати); аритмии 100–200 mg qd; след MI (поддържащо) 200 mg qd; функционални с палпитации 100 mg qd; мигрена 100–200 mg qd.
-    Бъбречна: без корекция. Чернодробна: обичайно без промяна; при много тежка — обмислете ↓. Възрастни хора: без корекция. Деца: данни 6–18 г.; <6 г. не е проучено.
+    Administer once daily, preferably in the morning. Tablets may be divided but must not be chewed or crushed. Swallow with at least half a glass of liquid. Food does not affect bioavailability. Dosage should be individualized to avoid bradycardia.
+    Guidance: hypertension 50–100 mg once daily; angina 100–200 mg once daily (may combine with nitrates if needed); arrhythmias 100–200 mg once daily; post-MI maintenance 200 mg once daily; functional disorders with palpitations 100 mg once daily; migraine prophylaxis 100–200 mg once daily.
+    Renal impairment: no adjustment needed. Hepatic impairment: generally no change; reduce in severe cases. Elderly: no adjustment. Children 6–18 years studied; <6 years not established.
 
 - doc_id: BETALOC-SMPC-2017-4_3
-  title: Беталок ЗОК — 4.3 Противопоказания
+  title: Betaloc ZOK — 4.3 Contraindications
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Кардиогенен шок; синдром на болния синусов възел (без постоянен пейсмейкър); AV-блок II–III; нестабилна, некомпенсирана СН (белодробен оток/хипоперфузия/хипотония) или продължителна/интермитентна бета-агонистична инотропна терапия; симптоматична брадикардия/хипотония; тежко периферно съдово заболяване.
-    Подозрян MI при HR<45/min, PQ>0,24 s или САН<100 mmHg — не прилагайте до стабилизиране. Свръхчувствителност към метопролол/помощни вещества/други бета-блокери.
+    Contraindicated in: cardiogenic shock; sick sinus syndrome (without pacemaker); second or third-degree AV block; unstable or uncompensated heart failure (pulmonary edema, hypoperfusion, hypotension) or ongoing beta-agonist inotropic therapy; symptomatic bradycardia or hypotension; severe peripheral arterial disease.
+    Do not use in suspected MI if HR <45 bpm, PQ >0.24 s, or systolic BP <100 mmHg. Hypersensitivity to metoprolol, excipients, or other beta-blockers.
 
 - doc_id: BETALOC-SMPC-2017-4_4
-  title: Беталок ЗОК — 4.4 Предупреждения и предпазни мерки
+  title: Betaloc ZOK — 4.4 Warnings and Precautions
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Не прилагайте i.v. верапамил при пациенти на бета-блокер. Възможно влошаване на периферни артериални заболявания; внимание при Prinzmetal (бета1-селективни с повишено внимание). Астма/ХОББ: бронходилататор; евентуално ↑ β2-агонист. Редки AV-проводни нарушения; анафилаксия по-тежка на бета-блокер; при феохромоцитом — добавете алфа-блокер.
-    Спиране: постепенно ≥2 седмици; крайна ниска доза ≥4 дни. Предоперативно: информирайте анестезиолога; избягвайте високи начални дози преди несърдечни операции.
+    Avoid intravenous verapamil in patients on beta-blockers. May worsen peripheral arterial disease; use with caution in Prinzmetal's angina (prefer cardioselective beta1 agents). Asthma/COPD: combine with bronchodilator; may require higher beta2 dose. Rare AV conduction issues; anaphylaxis may be more severe; in pheochromocytoma, add alpha-blocker. Withdrawal must be gradual over ≥2 weeks; maintain low dose ≥4 days before stopping. Before surgery, inform anesthesiologist; avoid high initial doses pre-noncardiac surgery.
 
 - doc_id: BETALOC-SMPC-2017-4_5
-  title: Беталок ЗОК — 4.5 Взаимодействия
+  title: Betaloc ZOK — 4.5 Drug Interactions
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    CYP2D6 инхибитори ↑ метопролол (хинидин, тербинафин, пароксетин, флуоксетин, сертралин, целекоксиб, пропафенон, дифенхидрамин). Избягвайте: барбитурати (индукция), пропафенон (2–5× ↑ нива + бета-блокада), i.v. верапамил с бета-блокер.
-    Възможна корекция/внимание: амиодарон; клас I антиаритмици; НСПВС (намаляват антихипертензивния ефект); дигиталис; дилтиазем; епинефрин с неселективни бета-блокери; фенилпропаноламин; хинидин; клонидин (ребаунд); рифампицин; МАО-инхибитори; инхал. анестетици; перорални антидиабетни; циметидин/хидралазин (↑ нива).
+    CYP2D6 inhibitors increase metoprolol levels (quinidine, terbinafine, paroxetine, fluoxetine, sertraline, celecoxib, propafenone, diphenhydramine). Avoid combinations with barbiturates, propafenone, or i.v. verapamil. Use caution or adjust dose with amiodarone, class I antiarrhythmics, NSAIDs (reduce antihypertensive effect), digoxin, diltiazem, epinephrine (with nonselective beta-blockers), phenylpropanolamine, quinidine, clonidine (rebound hypertension), rifampicin, MAO inhibitors, inhalational anesthetics, oral antidiabetics, cimetidine, or hydralazine.
 
 - doc_id: BETALOC-SMPC-2017-4_6
-  title: Беталок ЗОК — 4.6 Бременност и кърмене
+  title: Betaloc ZOK — 4.6 Fertility, Pregnancy, and Lactation
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Употреба само ако категорично необходима. Бета-блокери ↓ плацентарна перфузия (забавен растеж, IUFD, аборт, преждевременно раждане). Нужен матерно-фетален мониторинг. Риск за фетална/неонатална брадикардия; спиране 48–72 ч. преди планирано раждане или наблюдение на новороденото 48–72 ч.
-    Кърмене: метопролол ~3× плазмата в кърмата; риск нисък при терапевтични дози, но наблюдавайте за бета-блокада.
+    Use only if clearly necessary. Beta-blockers reduce placental perfusion, associated with growth retardation, fetal death, abortion, or preterm birth. Fetal/neonatal bradycardia may occur; discontinue 48–72 h before planned delivery or monitor newborn for 48–72 h. Metoprolol is present in breast milk (~3× plasma levels); risk to infants low at therapeutic doses but observe for beta-blockade.
 
-- doc_id: BETALOC-SMPC-2017-4_8_ae
-  title: Беталок ЗОК — 4.8 Нежелани реакции (извадка)
+- doc_id: BETALOC-SMPC-2017-4_8
+  title: Betaloc ZOK — 4.8 Undesirable Effects (summary)
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Чести: диспнея при усилия. Нечести: депресия, нарушения на съня, бронхоспазъм, обриви, изпотяване. Редки: ринит, алопеция, сексуална дисфункция. Много редки: нарушения на паметта, халюцинации, фоточувствителност, агравиран псориазис, тинитус, нарушения на вкуса, артралгия.
-    Съобщаване на НР: ИАЛ, ул. „Дамян Груев” 8, София 1303; +359 2 8903417; www.bda.bg.
+    Common: dyspnea on exertion. Uncommon: depression, sleep disturbance, bronchospasm, rash, sweating. Rare: rhinitis, alopecia, sexual dysfunction. Very rare: memory disorders, hallucinations, photosensitivity, aggravated psoriasis, tinnitus, taste disturbance, arthralgia.
+    Report adverse reactions to: Bulgarian Drug Agency, 8 “Damyan Gruev” St., 1303 Sofia; +359 2 8903417; www.bda.bg.
 
 - doc_id: BETALOC-SMPC-2017-4_9
-  title: Беталок ЗОК — 4.9 Предозиране
+  title: Betaloc ZOK — 4.9 Overdose
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Симптоми: хипотония, сърдечна недостатъчност, брадикардия/брадиаритмия, проводни нарушения, бронхоспазъм; понякога ЦНС/дихателна депресия.
-    Подход: грижи в подходящо място; при нужда стомашна промивка/активен въглен; атропин/адреностимуланти/пейсмейкър при брадикардия/AV блок; обем + глюкагон (болус/инфузия) + добутамин ± α1-агонисти; i.v. Ca2+; бронходилататори.
+    Symptoms: hypotension, heart failure, bradycardia/arrhythmia, conduction disturbances, bronchospasm; sometimes CNS or respiratory depression.
+    Management: supportive care in monitored setting; gastric lavage/activated charcoal if appropriate; atropine/adrenergic drugs/pacing for bradycardia or AV block; fluids + glucagon bolus/infusion + dobutamine ± alpha1-agonists for shock; i.v. calcium; bronchodilators if bronchospasm.
 
 - doc_id: BETALOC-SMPC-2017-5_1
-  title: Беталок ЗОК — 5.1 Фармакодинамика
+  title: Betaloc ZOK — 5.1 Pharmacodynamics
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Бета1-селективен блокер (ATC C07AB02); ↓ сърдечна честота, сърдечен дебит и АН; по-слаб ефект върху бронхиална мускулатура/метаболизъм спрямо неселективни бета-блокери; MERIT-HF: ↑ преживяемост, ↓ хоспитализации; ↓ риск от повторен инфаркт/внезапна смърт след MI.
+    Beta1-selective blocker (ATC C07AB02). Decreases heart rate, cardiac output, and BP. Less bronchial and metabolic impact than nonselective beta-blockers. MERIT-HF trial: improved survival and reduced hospitalizations; lowered risk of reinfarction and sudden death post-MI.
 
 - doc_id: BETALOC-SMPC-2017-5_2
-  title: Беталок ЗОК — 5.2 Фармакокинетика
+  title: Betaloc ZOK — 5.2 Pharmacokinetics
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    ZOK микросфери; pH-независимо освобождаване ~20 ч; ефект >24 ч. Абсорбция: пълна; бионаличност ~50% (first-pass); белтъчно свързване 5–10%. Метаболизъм: CYP2D6; три основни неактивни метаболита. Елиминация: >95% в урината; ~5% непроменен (до 30%); t½ ~3,5 ч (1–9); Cl ~1 L/min. Бъбречна увреда: PK ~непроменена; метаболити се натрупват при GFR <5 ml/min (без усилване на бета-блокадата). Тежка чернодробна увреда/портокавален шънт: ↑ бионаличност, ↓ клирънс. Педиатрия 6–17 г.: профил сходен; CL/F расте с тегло.
+    ZOK microsphere system; pH-independent release ~20 h; effect >24 h. Absorption: complete; bioavailability ~50% (first-pass). Protein binding 5–10%. Metabolism: hepatic CYP2D6 to inactive metabolites. Elimination: >95% in urine; 5% unchanged (up to 30%); half-life ~3.5 h (range 1–9); clearance ~1 L/min. Renal impairment: PK unchanged; metabolites may accumulate but without stronger beta-blockade. Severe hepatic impairment/portocaval shunt: ↑ bioavailability, ↓ clearance. Pediatric 6–17 y: similar PK; clearance rises with weight.
 
 - doc_id: BETALOC-SMPC-2017-6_1_6_6
-  title: Беталок ЗОК — Раздел 6 (фармацевтични данни)
+  title: Betaloc ZOK — Section 6 (Pharmaceutical Data)
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    6.1 Помощни вещества: етилцелулоза, хидроксипропил целулоза, хипромелоза, микрокристална целулоза, парафин, макрогол, безводен колоиден SiO2, натриев стеарил фумарат, TiO2 (E171).
-    6.2 Несъвместимости: неприложимо. 6.3 Срок на годност: 3 години. 6.4 Съхранение: без специални изисквания.
-    6.5 Опаковка: блистери PVC/PVDC/Al или PVC/Al; 28 таблетки 50 mg. 6.6 Изхвърляне/работа: неприложимо.
+    6.1 Excipients: ethylcellulose, hydroxypropyl cellulose, hypromellose, microcrystalline cellulose, paraffin, macrogol, colloidal silicon dioxide, sodium stearyl fumarate, titanium dioxide (E171).
+    6.2 Incompatibilities: none. 6.3 Shelf life: 3 years. 6.4 Storage: no special requirements. 6.5 Pack: PVC/PVDC/Al or PVC/Al blisters; 28 prolonged-release tablets, 50 mg. 6.6 Disposal: not applicable.
 
 - doc_id: BETALOC-SMPC-2017-7_10
-  title: Беталок ЗОК — Раздели 7–10 (притежател, номера, дати)
+  title: Betaloc ZOK — Sections 7–10 (MA Holder & Dates)
   domain: medicinal_product_characteristics
-  language: bg
+  language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Притежател на разрешението: AstraZeneca AB, S-151 85 Södertälje, Швеция.
-    Номер(а) на разрешението: 9900024.
-    Дати първо разрешаване/подновяване: 1999-01-12 / 2009-08-12.
-    Дата на актуализиране на текста: 25 юли 2017 г.
+    Marketing Authorisation Holder: AstraZeneca AB, S-151 85 Södertälje, Sweden.
+    Authorisation number: 9900024.
+    First authorisation/renewal dates: 1999-01-12 / 2009-08-12.
+    Text revision date: 25 July 2017.
 
-4) Quick Eval Prompts (BG)
+4) Quick Evaluation Prompts (English)
 
-Q1 (общо): „За какво се използва Беталок ЗОК 50 mg?“ → cite [BETALOC-SMPC-2017-4_1].
+Q1 (general): “What is Betaloc ZOK used for?” → cite [BETALOC-SMPC-2017-4_1].
 
-Q2 (дозиране): „Как се приема и може ли да се дели таблетката?“ → cite [BETALOC-SMPC-2017-4_2].
+Q2 (dosage): “How should I take Betaloc ZOK and can I split the tablet?” → cite [BETALOC-SMPC-2017-4_2].
 
-Q3 (противопоказания): „Кои са противопоказанията?“ → cite [BETALOC-SMPC-2017-4_3].
+Q3 (contraindications): “Who should not take Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_3].
 
-Q4 (предупреждения): „Какви предпазни мерки има?“ → cite [BETALOC-SMPC-2017-4_4].
+Q4 (warnings): “What precautions should I follow?” → cite [BETALOC-SMPC-2017-4_4].
 
-Q5 (взаимодействия): „С кои лекарства взаимодейства?“ → cite [BETALOC-SMPC-2017-4_5].
+Q5 (interactions): “Which drugs interact with Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_5].
 
-Q6 (бременност/кърмене): „Може ли при бременност или кърмене?“ → cite [BETALOC-SMPC-2017-4_6].
+Q6 (pregnancy/lactation): “Can it be used during pregnancy or breastfeeding?” → cite [BETALOC-SMPC-2017-4_6].
 
-Q7 (нежелани реакции): „Какви нежелани реакции са описани?“ → cite [BETALOC-SMPC-2017-4_8_ae].
+Q7 (side effects): “What side effects can occur?” → cite [BETALOC-SMPC-2017-4_8].
 
-Q8 (предозиране): „Какво се прави при предозиране?“ → cite [BETALOC-SMPC-2017-4_9].
+Q8 (overdose): “What happens if I take too much Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_9].
 
-Q9 (фармако-): „Как действа и колко време?“ → cite [BETALOC-SMPC-2017-5_1][BETALOC-SMPC-2017-5_2].
+Q9 (pharmacology): “How does Betaloc ZOK work and how long does it last?” → cite [BETALOC-SMPC-2017-5_1][BETALOC-SMPC-2017-5_2].
 
-Q10 (логистика): „Опаковка, съхранение и коя е компанията?“ → cite [BETALOC-SMPC-2017-6_1_6_6][BETALOC-SMPC-2017-7_10].
-
-Notes for your integrator (one-liners)
-
-Filter retrieval to these doc_ids (prefix BETALOC-SMPC-2017) and language: bg.
-
-Keep k ≤ 6 and total retrieved text ≤ ~1200 tokens.
-
-Ensure every answer ends with the disclaimer and contains at least one [BETALOC-SMPC-2017-*] citation.
+Q10 (storage/company): “Who makes Betaloc ZOK and how should it be stored?” → cite [BETALOC-SMPC-2017-6_1_6_6][BETALOC-SMPC-2017-7_10].
