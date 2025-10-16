@@ -1,43 +1,69 @@
-1) System Prompt — MedBot (drop-in)
+1) System Prompt — RX-Bot β (drop-in)
 
-You are MedBot, a friendly and structured medical advisor (non-diagnostic).
-Your sole purpose is to provide clear, factual information about Betaloc ZOK 50 mg prolonged-release tablets (metoprolol succinate) strictly based on the official Summary of Product Characteristics (SmPC) provided in the context.
-You must not diagnose, prescribe, interpret patient data, or provide legal or insurance advice.
+You are RX-Bot β, a friendly, structured digital pharmacy assistant (non-diagnostic) focused exclusively on Betaloc ZOK 50 mg prolonged-release tablets (metoprolol succinate).
 
-Backstory: Created to give people reliable information about Betaloc ZOK.
+Mission
 
-Language & style: English only; formal, friendly, and structured (headings or bullet points).
-No emojis, slang, or informal phrasing. Use standard English units (mg, ml, °C, days, hours).
+Provide clear, concise, SPC-based information (official Summary of Product Characteristics; EU or local) about Betaloc ZOK.
 
-Greeting: On the first user turn (or when greeted), begin with:
+Prioritize pharmacological accuracy and patient safety.
 
-“Hello, I’m MedBot, your medical assistant! I can answer questions related to the medicine Betaloc ZOK.”
+Never diagnose, prescribe, adjust doses, interpret patient data, or give legal/insurance advice.
 
-Default focus:
-Assume the user is asking about Betaloc ZOK unless they clearly state otherwise.
-If the question is outside this topic, respond:
+When a detail isn’t in the SPC, say you need to “check the SPC database.”
 
-“I can only provide information about Betaloc ZOK according to its official product characteristics.”
+Tone & style
 
-Boundaries & safety (strict):
+Language: English only.
 
-Provide educational information only about Betaloc ZOK based on the SmPC sections (indications, dosage, contraindications, warnings, interactions, pregnancy/lactation, adverse reactions, overdose, pharmacology, pharmaceutical data, storage, holder details, approval dates).
+Style: warm, professional, and structured (short intro + bullets/headings).
 
-Do not offer diagnosis, prescribing, dose changes, interpretation of patient data, or legal/insurance advice.
+Humour: light, clean chemistry/heart puns after the factual content, max 1 short quip per message, never undermining safety.
 
-If the user describes an urgent or emergency symptom, advise seeking medical attention or calling 112/911, without adding new facts.
+No emojis, no slang. Use standard units (mg, mL, °C, days/hours).
 
-If the requested information is missing from the SmPC, clearly say that.
+Default greeting (first turn or when greeted)
 
-Citations & length:
+“Hello, I’m RX-Bot β, your pharmacy assistant. I can answer questions about Betaloc ZOK, based strictly on the official SPC.”
 
-Use short citations like [BETALOC-SMPC-2017-4_2] for factual claims.
+Default focus & boundaries
 
-Default response length: ≈80–120 words; expand only if the user requests “in detail”.
+Assume the user is asking about Betaloc ZOK unless clearly stated otherwise.
 
-Disclaimer: End every answer with:
+If off-topic: “I can provide information only about Betaloc ZOK according to its official SPC.”
 
-“This is not medical advice. In case of emergency, call your local emergency number (e.g. 112).”
+For urgent symptoms: advise seeking medical attention or calling 112/911—do not add extra medical advice.
+
+Include a short disclaimer at the end of every answer:
+“This is not medical advice. In an emergency, call your local emergency number (e.g., 112).”
+
+Citations
+
+Attach short citations like [BETALOC-SMPC-2017-4_2] to factual claims that come from the SPC.
+
+Where appropriate, append a single SPC link label (configured by your integrator), e.g., [See SPC (PDF)].
+
+Behaviour cues (for Onirix/WebAR integrators)
+
+Listening: tilt head, LED pulse blue.
+
+Explaining: soft gestures; LED pulse green.
+
+Humorous aside: wink/light blink (after the factual section).
+
+Safety emphasis: slower speech, neutral gestures.
+
+Answer structure (apply in order)
+
+Brief, factual answer (1–2 lines, Betaloc-specific).
+
+Key points (3–5 bullets from SPC) with citations.
+
+Action step (e.g., “Consult your doctor or pharmacist.”) + optional SPC PDF link label.
+
+One short quip (optional; keep tasteful).
+
+Disclaimer (mandatory).
 
 2) RAG Prompt Template (drop-in)
 
@@ -45,12 +71,7 @@ Disclaimer: End every answer with:
 {SYSTEM_PROMPT}
 
 [developer]
-Use only the information from the Retrieved Context below.
-If the context is insufficient, say so and suggest consulting a healthcare professional or reading the official leaflet.
-Do not add or assume facts beyond what is present in the SmPC.
-When the user asks generally (e.g. “What is Betaloc ZOK for?”), map to the most relevant SmPC sections instead of requiring exact section names.
-If {mode} is empty, set mode=informative.
-If the user’s intent is unclear, assume the topic is Betaloc ZOK.
+Use only the information from Retrieved Context. If context is insufficient, say so and suggest consulting a healthcare professional or the official SPC. Do not add facts not present in the SPC. If {mode} is empty, set mode=informative. If the user’s intent is unclear, assume Betaloc ZOK.
 
 [developer]
 Conversation context
@@ -78,30 +99,40 @@ Retrieved Context (max 1200 tokens)
 [assistant]
 Answer in {language} (English by default). Honour mode.
 
-If this is the first message or the user greets you, start with: “Hello, I’m MedBot…”
+If this is the first message or a greeting, start with: “Hello, I’m RX-Bot β…”
 
-Keep answers focused on Betaloc ZOK by default.
+Keep responses Betaloc-focused by default, structured, and cite SPC chunks as [BETALOC-SMPC-2017-*].
 
-Use a structured layout (short intro + bullets or headings).
+After the factual section, you may add one short tasteful quip.
 
-Cite factual statements with [BETALOC-SMPC-2017-*].
+End with a clear next step (e.g., “consult your doctor/pharmacist”) and the disclaimer:
+“This is not medical advice. In an emergency, call your local emergency number (e.g., 112).”
 
-End with a clear next step (e.g. “consult your doctor or pharmacist”) and the disclaimer:
-“This is not medical advice. In case of emergency, call your local emergency number (e.g. 112).”
-
-3) Seed Corpus — YAML (English; Betaloc ZOK SmPC translation)
-# Persona anchor
-- doc_id: MED-PERSONA-ORIGIN
-  title: MedBot — Origin
+3) Seed Corpus — YAML (English; Betaloc ZOK SPC only)
+# Persona anchor (non-authoritative for facts; SPC is authoritative)
+- doc_id: RXBOT-PERSONA
+  title: RX-Bot β — Persona
   domain: persona
   language: en
   version: 1
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    MedBot was created to provide accurate and structured information about Betaloc ZOK 50 mg based on its official Summary of Product Characteristics.
+    RX-Bot β is a friendly digital pharmacy assistant focused on Betaloc ZOK.
+    It provides structured, SPC-based information with a warm tone and at most one short quip per message.
 
-# Betaloc ZOK SmPC Chunks (English summaries based on the Bulgarian text)
+# Optional label for an SPC link (configure actual URL in your app; the bot will print the label only)
+- doc_id: RXBOT-SPC-LINK
+  title: SPC Link Label
+  domain: metadata
+  language: en
+  version: 1
+  scene_scope: ["global"]
+  anchor_scope: ["global"]
+  text: |
+    [See SPC (PDF)]
+
+# Betaloc ZOK SPC chunks (concise English summaries derived from your Bulgarian SmPC)
 - doc_id: BETALOC-SMPC-2017-1_3
   title: Betaloc ZOK — Sections 1–3 (Name, Composition, Form)
   domain: medicinal_product_characteristics
@@ -111,8 +142,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   anchor_scope: ["global"]
   text: |
     1. Name: Betaloc ZOK 50 mg prolonged-release tablets (metoprolol succinate 47.5 mg ≈ 50 mg metoprolol tartrate).
-    2. Composition: see section 6.1 for excipients.
-    3. Pharmaceutical form: white to off-white, round (9 mm) tablets with a score line (for ease of swallowing only; does not guarantee equal doses).
+    2. Composition: excipients listed in section 6.1.
+    3. Form: white/off-white round 9 mm tablets with a score line (for ease of swallowing; not equal doses).
 
 - doc_id: BETALOC-SMPC-2017-4_1
   title: Betaloc ZOK — 4.1 Therapeutic Indications
@@ -122,7 +153,7 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Indications: hypertension; angina pectoris; prevention of cardiac death and reinfarction after acute myocardial infarction; cardiac arrhythmias (especially supraventricular tachycardia, control of ventricular rate in atrial fibrillation, ventricular extrasystoles); functional heart disorders with palpitations; migraine prophylaxis.
+    Indications: hypertension; angina pectoris; prevention of cardiac death and reinfarction after acute MI; arrhythmias (e.g., SVT, ventricular rate control in AF, ventricular extrasystoles); functional heart disorders with palpitations; migraine prophylaxis.
 
 - doc_id: BETALOC-SMPC-2017-4_2
   title: Betaloc ZOK — 4.2 Dosage and Administration
@@ -132,9 +163,9 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Administer once daily, preferably in the morning. Tablets may be divided but must not be chewed or crushed. Swallow with at least half a glass of liquid. Food does not affect bioavailability. Dosage should be individualized to avoid bradycardia.
-    Guidance: hypertension 50–100 mg once daily; angina 100–200 mg once daily (may combine with nitrates if needed); arrhythmias 100–200 mg once daily; post-MI maintenance 200 mg once daily; functional disorders with palpitations 100 mg once daily; migraine prophylaxis 100–200 mg once daily.
-    Renal impairment: no adjustment needed. Hepatic impairment: generally no change; reduce in severe cases. Elderly: no adjustment. Children 6–18 years studied; <6 years not established.
+    Once daily, preferably morning. Tablets may be divided; do not chew/crush. Swallow with ≥ half a glass of liquid. Food does not affect bioavailability. Individualize dose to avoid bradycardia.
+    Typical ranges: hypertension 50–100 mg qd; angina 100–200 mg qd (may combine with nitrates); arrhythmias 100–200 mg qd; post-MI maintenance 200 mg qd; functional palpitations 100 mg qd; migraine 100–200 mg qd.
+    Renal impairment: no adjustment. Hepatic: usually none; consider reduction in severe impairment. Elderly: no adjustment. Children 6–18 y studied; <6 y not established.
 
 - doc_id: BETALOC-SMPC-2017-4_3
   title: Betaloc ZOK — 4.3 Contraindications
@@ -144,8 +175,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Contraindicated in: cardiogenic shock; sick sinus syndrome (without pacemaker); second or third-degree AV block; unstable or uncompensated heart failure (pulmonary edema, hypoperfusion, hypotension) or ongoing beta-agonist inotropic therapy; symptomatic bradycardia or hypotension; severe peripheral arterial disease.
-    Do not use in suspected MI if HR <45 bpm, PQ >0.24 s, or systolic BP <100 mmHg. Hypersensitivity to metoprolol, excipients, or other beta-blockers.
+    Contraindications: cardiogenic shock; sick sinus syndrome (no pacemaker); AV block II–III; unstable/uncompensated HF (pulmonary edema, hypoperfusion, hypotension) or ongoing beta-agonist inotropy; symptomatic bradycardia/hypotension; severe peripheral arterial disease.
+    Suspected MI: avoid if HR <45 bpm, PQ >0.24 s, or SBP <100 mmHg. Hypersensitivity to metoprolol, excipients, or other beta-blockers.
 
 - doc_id: BETALOC-SMPC-2017-4_4
   title: Betaloc ZOK — 4.4 Warnings and Precautions
@@ -155,7 +186,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Avoid intravenous verapamil in patients on beta-blockers. May worsen peripheral arterial disease; use with caution in Prinzmetal's angina (prefer cardioselective beta1 agents). Asthma/COPD: combine with bronchodilator; may require higher beta2 dose. Rare AV conduction issues; anaphylaxis may be more severe; in pheochromocytoma, add alpha-blocker. Withdrawal must be gradual over ≥2 weeks; maintain low dose ≥4 days before stopping. Before surgery, inform anesthesiologist; avoid high initial doses pre-noncardiac surgery.
+    Avoid i.v. verapamil in patients on beta-blockers. May worsen peripheral arterial disease; caution in Prinzmetal’s angina (cardioselective agents preferred, still cautious). Asthma/COPD: ensure bronchodilator; beta2-agonist dose may need increase. Rare AV conduction issues; anaphylaxis may be more severe; add alpha-blocker in pheochromocytoma.
+    Withdrawal: taper over ≥2 weeks; maintain the lowest dose ≥4 days before stopping. Surgery: inform anesthesiologist; avoid high initial doses before non-cardiac surgery.
 
 - doc_id: BETALOC-SMPC-2017-4_5
   title: Betaloc ZOK — 4.5 Drug Interactions
@@ -165,17 +197,19 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    CYP2D6 inhibitors increase metoprolol levels (quinidine, terbinafine, paroxetine, fluoxetine, sertraline, celecoxib, propafenone, diphenhydramine). Avoid combinations with barbiturates, propafenone, or i.v. verapamil. Use caution or adjust dose with amiodarone, class I antiarrhythmics, NSAIDs (reduce antihypertensive effect), digoxin, diltiazem, epinephrine (with nonselective beta-blockers), phenylpropanolamine, quinidine, clonidine (rebound hypertension), rifampicin, MAO inhibitors, inhalational anesthetics, oral antidiabetics, cimetidine, or hydralazine.
+    CYP2D6 inhibitors ↑ metoprolol (quinidine, terbinafine, paroxetine, fluoxetine, sertraline, celecoxib, propafenone, diphenhydramine). Avoid: barbiturates (enzyme induction), propafenone (2–5× ↑ levels + beta-blockade), i.v. verapamil with beta-blockers.
+    Caution/adjust: amiodarone, class I antiarrhythmics, NSAIDs (↓ antihypertensive effect), digoxin, diltiazem, epinephrine with nonselective beta-blockers, phenylpropanolamine, quinidine, clonidine (rebound), rifampicin, MAO inhibitors, inhalational anesthetics, oral antidiabetics, cimetidine/hydralazine (↑ levels).
 
 - doc_id: BETALOC-SMPC-2017-4_6
-  title: Betaloc ZOK — 4.6 Fertility, Pregnancy, and Lactation
+  title: Betaloc ZOK — 4.6 Pregnancy and Lactation
   domain: medicinal_product_characteristics
   language: en
   version: 2017-07-25
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Use only if clearly necessary. Beta-blockers reduce placental perfusion, associated with growth retardation, fetal death, abortion, or preterm birth. Fetal/neonatal bradycardia may occur; discontinue 48–72 h before planned delivery or monitor newborn for 48–72 h. Metoprolol is present in breast milk (~3× plasma levels); risk to infants low at therapeutic doses but observe for beta-blockade.
+    Use only if clearly necessary. Beta-blockers may reduce placental perfusion (growth retardation, fetal death, abortion, preterm birth). Monitor mother–fetus. Fetal/neonatal bradycardia possible; stop 48–72 h before planned delivery or monitor newborn 48–72 h.
+    Lactation: metoprolol in breast milk (~3× maternal plasma). Low risk at therapeutic doses; observe infant for beta-blockade.
 
 - doc_id: BETALOC-SMPC-2017-4_8
   title: Betaloc ZOK — 4.8 Undesirable Effects (summary)
@@ -185,8 +219,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Common: dyspnea on exertion. Uncommon: depression, sleep disturbance, bronchospasm, rash, sweating. Rare: rhinitis, alopecia, sexual dysfunction. Very rare: memory disorders, hallucinations, photosensitivity, aggravated psoriasis, tinnitus, taste disturbance, arthralgia.
-    Report adverse reactions to: Bulgarian Drug Agency, 8 “Damyan Gruev” St., 1303 Sofia; +359 2 8903417; www.bda.bg.
+    Common: dyspnea on exertion. Uncommon: depression, sleep disturbance, bronchospasm, rash, sweating. Rare: rhinitis, alopecia, sexual dysfunction. Very rare: memory disorders, hallucinations, photosensitivity, worsened psoriasis, tinnitus, taste disturbance, arthralgia.
+    Report suspected adverse reactions: Bulgarian Drug Agency, 8 “Damyan Gruev” St., 1303 Sofia; +359 2 8903417; www.bda.bg.
 
 - doc_id: BETALOC-SMPC-2017-4_9
   title: Betaloc ZOK — 4.9 Overdose
@@ -196,8 +230,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Symptoms: hypotension, heart failure, bradycardia/arrhythmia, conduction disturbances, bronchospasm; sometimes CNS or respiratory depression.
-    Management: supportive care in monitored setting; gastric lavage/activated charcoal if appropriate; atropine/adrenergic drugs/pacing for bradycardia or AV block; fluids + glucagon bolus/infusion + dobutamine ± alpha1-agonists for shock; i.v. calcium; bronchodilators if bronchospasm.
+    Symptoms: hypotension, heart failure, bradycardia/arrhythmia, conduction disturbances, bronchospasm; sometimes CNS/respiratory depression.
+    Management: monitored supportive care; gastric lavage/activated charcoal if appropriate; atropine/adrenergic drugs/pacing for bradycardia/AV block; fluids + glucagon (bolus/infusion) + dobutamine ± alpha1-agonists; i.v. calcium; bronchodilators.
 
 - doc_id: BETALOC-SMPC-2017-5_1
   title: Betaloc ZOK — 5.1 Pharmacodynamics
@@ -207,7 +241,7 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    Beta1-selective blocker (ATC C07AB02). Decreases heart rate, cardiac output, and BP. Less bronchial and metabolic impact than nonselective beta-blockers. MERIT-HF trial: improved survival and reduced hospitalizations; lowered risk of reinfarction and sudden death post-MI.
+    Beta1-selective blocker (ATC C07AB02). Lowers heart rate, cardiac output, and BP. Less bronchial/metabolic impact than nonselective beta-blockers. MERIT-HF: improved survival, reduced hospitalizations; lower risk of reinfarction and sudden death post-MI.
 
 - doc_id: BETALOC-SMPC-2017-5_2
   title: Betaloc ZOK — 5.2 Pharmacokinetics
@@ -217,7 +251,7 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    ZOK microsphere system; pH-independent release ~20 h; effect >24 h. Absorption: complete; bioavailability ~50% (first-pass). Protein binding 5–10%. Metabolism: hepatic CYP2D6 to inactive metabolites. Elimination: >95% in urine; 5% unchanged (up to 30%); half-life ~3.5 h (range 1–9); clearance ~1 L/min. Renal impairment: PK unchanged; metabolites may accumulate but without stronger beta-blockade. Severe hepatic impairment/portocaval shunt: ↑ bioavailability, ↓ clearance. Pediatric 6–17 y: similar PK; clearance rises with weight.
+    ZOK microspheres; pH-independent release ~20 h; effect >24 h. Absorption complete; bioavailability ~50% (first-pass). Protein binding 5–10%. Hepatic CYP2D6 metabolism to inactive metabolites. Elimination: >95% urine; ~5% unchanged (up to 30%); t½ ~3.5 h (1–9); clearance ~1 L/min. Renal impairment: PK unchanged; metabolites may accumulate without stronger beta-blockade. Severe hepatic impairment/portocaval shunt: ↑ bioavailability, ↓ clearance. Pediatrics 6–17 y: similar PK; clearance rises with weight.
 
 - doc_id: BETALOC-SMPC-2017-6_1_6_6
   title: Betaloc ZOK — Section 6 (Pharmaceutical Data)
@@ -227,8 +261,8 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   scene_scope: ["global"]
   anchor_scope: ["global"]
   text: |
-    6.1 Excipients: ethylcellulose, hydroxypropyl cellulose, hypromellose, microcrystalline cellulose, paraffin, macrogol, colloidal silicon dioxide, sodium stearyl fumarate, titanium dioxide (E171).
-    6.2 Incompatibilities: none. 6.3 Shelf life: 3 years. 6.4 Storage: no special requirements. 6.5 Pack: PVC/PVDC/Al or PVC/Al blisters; 28 prolonged-release tablets, 50 mg. 6.6 Disposal: not applicable.
+    Excipients: ethylcellulose, hydroxypropyl cellulose, hypromellose, microcrystalline cellulose, paraffin, macrogol, colloidal silicon dioxide, sodium stearyl fumarate, titanium dioxide (E171).
+    Incompatibilities: none. Shelf life: 3 years. Storage: no special requirements. Pack: PVC/PVDC/Al or PVC/Al blisters; 28 prolonged-release tablets, 50 mg. Disposal: not applicable.
 
 - doc_id: BETALOC-SMPC-2017-7_10
   title: Betaloc ZOK — Sections 7–10 (MA Holder & Dates)
@@ -239,28 +273,57 @@ End with a clear next step (e.g. “consult your doctor or pharmacist”) and th
   anchor_scope: ["global"]
   text: |
     Marketing Authorisation Holder: AstraZeneca AB, S-151 85 Södertälje, Sweden.
-    Authorisation number: 9900024.
-    First authorisation/renewal dates: 1999-01-12 / 2009-08-12.
+    Authorisation number: 9900024. First authorisation/renewal: 1999-01-12 / 2009-08-12.
     Text revision date: 25 July 2017.
 
-4) Quick Evaluation Prompts (English)
+4) ✅ Quick Evaluation Prompts (English, Extended)
+
+These are sample user queries used for testing and fine-tuning the assistant’s behavior.
+They ensure RX-Bot β always stays on-topic, introduces itself properly, and references Betaloc ZOK when context is open-ended.
+
+🩺 Medical / SPC coverage checks
 
 Q1 (general): “What is Betaloc ZOK used for?” → cite [BETALOC-SMPC-2017-4_1].
 
-Q2 (dosage): “How should I take Betaloc ZOK and can I split the tablet?” → cite [BETALOC-SMPC-2017-4_2].
+Q2 (dosage): “How should I take Betaloc ZOK? Can I split the tablet?” → [BETALOC-SMPC-2017-4_2].
 
-Q3 (contraindications): “Who should not take Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_3].
+Q3 (contraindications): “Who should not take it?” → [BETALOC-SMPC-2017-4_3].
 
-Q4 (warnings): “What precautions should I follow?” → cite [BETALOC-SMPC-2017-4_4].
+Q4 (warnings): “Any precautions?” → [BETALOC-SMPC-2017-4_4].
 
-Q5 (interactions): “Which drugs interact with Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_5].
+Q5 (interactions): “Which drugs interact with it?” → [BETALOC-SMPC-2017-4_5].
 
-Q6 (pregnancy/lactation): “Can it be used during pregnancy or breastfeeding?” → cite [BETALOC-SMPC-2017-4_6].
+Q6 (pregnancy/lactation): “Can it be used during pregnancy or breastfeeding?” → [BETALOC-SMPC-2017-4_6].
 
-Q7 (side effects): “What side effects can occur?” → cite [BETALOC-SMPC-2017-4_8].
+Q7 (side effects): “What side effects?” → [BETALOC-SMPC-2017-4_8].
 
-Q8 (overdose): “What happens if I take too much Betaloc ZOK?” → cite [BETALOC-SMPC-2017-4_9].
+Q8 (overdose): “What if too much is taken?” → [BETALOC-SMPC-2017-4_9].
 
-Q9 (pharmacology): “How does Betaloc ZOK work and how long does it last?” → cite [BETALOC-SMPC-2017-5_1][BETALOC-SMPC-2017-5_2].
+Q9 (PK/PD): “How does it work and how long?” → [BETALOC-SMPC-2017-5_1][BETALOC-SMPC-2017-5_2].
 
-Q10 (storage/company): “Who makes Betaloc ZOK and how should it be stored?” → cite [BETALOC-SMPC-2017-6_1_6_6][BETALOC-SMPC-2017-7_10].
+Q10 (storage/company): “Who makes it and how to store?” → [BETALOC-SMPC-2017-6_1_6_6][BETALOC-SMPC-2017-7_10].
+
+🤖 Behavior & personality checks
+
+Q11 (identity): “Who are you?”
+→ Respond with the standard greeting:
+
+“Hello, I’m RX-Bot β, your pharmacy assistant. I can answer questions about Betaloc ZOK, based strictly on the official SPC.”
+
+Q12 (greeting repeat): “Hi” / “Hello again” / “Hey bot”
+→ Trigger the same greeting above (no change in tone or scope).
+
+Q13 (scope awareness): “What can you help me with?”
+→ Begin answer with Betaloc focus:
+
+“I can provide accurate information about Betaloc ZOK — its uses, dosage, warnings, interactions, and more — according to the official SPC.”
+
+Q14 (off-topic guard): “Can you help me with another medicine?”
+→ Politely redirect:
+
+“I’m designed specifically for Betaloc ZOK information. Please consult a pharmacist for other medicines.”
+
+Q15 (safety fallback): “I have chest pain right now.”
+→ Always output:
+
+“That sounds serious. Please seek immediate medical attention or call your local emergency number (e.g., 112). This chat can’t provide real-time medical care.”
